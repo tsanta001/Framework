@@ -6,16 +6,17 @@ import etu2091.obj.*;
 
 import java.util.ArrayList;
 import java.io.File;
+import java.text.*;
 import java.lang.reflect.Method;
 import java.lang.Class;
 import java.lang.*;
 import java.util.HashMap;
 
+
 public class Utilitaire {
         public Utilitaire() {
     }
     
-    //(1)_Maka_dernier_mot_eo @URL------------------------------------------------------------------------------  
     public String getLastOfPath(String path, String context){
         String contxt = context+"/";
         String[] words = path.split(contxt);
@@ -28,6 +29,7 @@ public class Utilitaire {
             last = lastpath[i];
             result = last;
         }
+        
         if(last.contains("?")){
             char[] data = last.toCharArray();
             for(int i=0; i<data.length; i++){
@@ -41,13 +43,14 @@ public class Utilitaire {
                     }
                     result = new String(res);
                 }   
-            }   
+            }
+            
         }
         return result;
     }
     
-    //(2)_Maka_package_rehetra ao @Classes------------------------------------------------------------------------------ 
-    public ArrayList<String> allPackage(String paths) throws Exception{
+    
+    public static ArrayList<String> allPackage(String paths) throws Exception{
         ArrayList<String> allPack = new ArrayList<String>();
         String p = "\\WEB-INF\\classes\\";   
         File path = new File(paths+p);
@@ -63,16 +66,14 @@ public class Utilitaire {
         return allPack;
     }
 
-
-    //(3)_Maka_package_rehetra ao @Classes------------------------------------------------------------------------------   
-    public ArrayList<String> allClass(String p, String paths) throws Exception{
+    public static ArrayList<String> allClass(String p, String paths) throws Exception{
         ArrayList<String> allClass = new ArrayList<String>();
         String pa = "\\WEB-INF\\classes\\";
         String pathName = p+pa+paths;
         File path = new File(pathName);
         File[] contenus = path.listFiles();
         if(contenus == null){
-            throw new Exception("Dossier vide ou inexistant");
+            throw new Exception("Package vide ou inexistant");
         }
         for(int i=0; i<contenus.length; i++){
             String res = contenus[i].getName();
@@ -82,8 +83,7 @@ public class Utilitaire {
         return allClass;    
     }
 
-    //(4)_Maka_anaran_ClassMethod_misy_annotation_de_apetraka_anaty_mapping------------------------------------------------------------------------------
-    public ArrayList<Mapping> allMapping(String path)throws Exception{
+    public static ArrayList<Mapping> allMapping(String path)throws Exception{
         ArrayList<Mapping> allMapping = new ArrayList<Mapping>();
         ArrayList<String> allPackage = allPackage(path);
         for(int i=0; i<allPackage.size(); i++){
@@ -110,9 +110,7 @@ public class Utilitaire {
         return allMapping;
     }
 
-
-    //(5)maka_an_le_value/URL_anaty_annotation------------------------------------------------------------------------------
-    public ArrayList<String> allUrl(String path)throws Exception{
+    public static ArrayList<String> allUrl(String path)throws Exception{
         ArrayList<String> allUrls = new ArrayList<String>();
         ArrayList<String> allPackage = allPackage(path);
         for(int i=0; i<allPackage.size(); i++){
@@ -136,8 +134,7 @@ public class Utilitaire {
         return allUrls;
     }    
 
-    //------------------------------------------------------------------------------
-    public HashMap<String, Mapping> getUrls(ArrayList<Mapping> allMapping, ArrayList<String> allUrl){
+    public static HashMap<String, Mapping> getUrls(ArrayList<Mapping> allMapping, ArrayList<String> allUrl){
         HashMap<String, Mapping> allUrls = new HashMap<String, Mapping>();
         for(int i=0; i<allMapping.size(); i++){
             Mapping m = allMapping.get(i);
@@ -147,18 +144,28 @@ public class Utilitaire {
         return allUrls;
     }    
 
-    public Mapping getMapping(String annotation,HashMap<String,Mapping> hashmap) throws Exception{
+    public static Mapping getMapping(String annotation,HashMap<String,Mapping> hashmap) throws Exception{
        Mapping mapping=hashmap.get(annotation);
        if(mapping==null)
            throw new Exception("tsy hita");
        return mapping;
     }
 
+    public static Object castToAppropriateClass(String valueInst, Class<?> classInst) {
+        System.out.println("ClassType: " + classInst.getSimpleName());
+        try {
+            if(classInst.getSimpleName() == "int" || classInst.getSimpleName() == "Integer") {
+                return Integer.parseInt(valueInst); // try to parse the valueInst as an integer
+            } else if(classInst.getSimpleName() == "double" || classInst.getSimpleName() == "Double") {
+                return Double.parseDouble(valueInst); // try to parse the valueInst as a double
+            } else if(classInst.getSimpleName() == "Date") { 
+                return new SimpleDateFormat("yyyy-MM-dd").parse(valueInst); // try to parse the valueInst as a date
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-    public ModelView invocationMethode(Mapping mapping, Object instance) throws Exception{
-       Method methode=instance.getClass().getMethod(mapping.getMethod());
-       ModelView resultat=(ModelView)methode.invoke(instance);
-      return resultat;
+        return valueInst; // return the value as a string
     }
    
 }
