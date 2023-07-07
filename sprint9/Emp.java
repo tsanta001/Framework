@@ -1,6 +1,9 @@
 package model;
 
 import etu2091.annotation.*;
+import etu2091.obj.FileUpload;
+import etu2091.obj.ModelView;
+
 import java.util.ArrayList;
 import etu2091.obj.*;
 
@@ -10,8 +13,17 @@ public class Emp {
 	String nom;
 	String prenom;
     int age;
+    FileUpload fileUp;
 
-	public Emp(int id, String nom, String prenom, int age){
+	public Emp(int id, String nom, String prenom, int age,FileUpload fileUp){
+		this.id = id;
+        this.nom = nom;
+		this.prenom = prenom;
+        this.age = age;
+        this.fileUp=fileUp;
+	}
+
+    public Emp(int id, String nom, String prenom, int age){
 		this.id = id;
         this.nom = nom;
 		this.prenom = prenom;
@@ -31,6 +43,10 @@ public class Emp {
     public int getAge() {
         return age;
     }
+    public FileUpload getFile() {
+        return fileUp;
+    }
+
 
     public void setid(int id) {
         this.id = id;
@@ -43,6 +59,9 @@ public class Emp {
     }
     public void setage(int age) {
         this.age = age;
+    }
+    public void setfile(FileUpload fileUp) {
+        this.fileUp = fileUp;
     }
 
     @MyAnnotation(value = "emp-findAll")
@@ -61,6 +80,8 @@ public class Emp {
         System.out.println("Nom "+this.getNom());
         System.out.println("Prenom "+this.getPrenom());
         System.out.println("Age "+this.getAge());
+        System.out.println("File "+this.getFile());
+
     }
 
     public ArrayList<Emp> listEmp() {
@@ -78,5 +99,11 @@ public class Emp {
     	view.setView("hello.jsp");
     	view.addItem("list", this.listEmp());
     	return view;
+    }
+
+    public ModelView save(){
+        ModelView modelview =new ModelView("fileUp.jsp");
+        modelview.addItem("tsyAttribut", this.getFile().getName());
+        return modelview;
     }
 }

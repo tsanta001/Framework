@@ -2,13 +2,14 @@ package etu2091.framework.servlet;
 
 import etu2091.framework.Mapping;
 import etu2091.obj.*;
+
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 import java.text.*;
 import java.lang.reflect.*;
+import javax.servlet.http.Part;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -68,18 +69,32 @@ public class FrontServlet extends HttpServlet {
             Mapping mapping=Utilitaire.getMapping(wordsPath, mappingUrls);
             Class<?> classInstance = Class.forName(mapping.getClassName());
             Object newObjet = classInstance.newInstance();
+
+            //Tableau d'attribut
             Field[] attributs = newObjet.getClass().getDeclaredFields();
             for(int i=0; i<attributs.length; i++){
                 String valeur = request.getParameter(attributs[i].getName());
-                if(valeur!=null){
-                    if(attributs[i].getType().getSimpleName().equals("int")){
-                        int value = Integer.valueOf(valeur);
-                        attributs[i].setAccessible(true);
-                        attributs[i].set(newObjet, value);    
-                    }else{
-                        attributs[i].setAccessible(true);
-                        attributs[i].set(newObjet, valeur);
+                if(attributs[i].getType().getSimpleName().equals("FileUpload")==false){
+                    if(valeur!=null){
+                        if(attributs[i].getType().getSimpleName().equals("int")){
+                            int value = Integer.valueOf(valeur);
+                            attributs[i].setAccessible(true);
+                            attributs[i].set(newObjet, value);    
+                        }else{
+                            attributs[i].setAccessible(true);
+                            attributs[i].set(newObjet, valeur);
+                        }
                     }
+                }else{
+                    try{
+                        Part part = request.getPart(attributs[i].getName());
+                        byte[] b=new byte[1024];
+                        DataInputStream dis=new DataInputStream(part.getInputStream());
+                        dis.readFully(b);
+                        dis.close();
+                        attributs[i].set(newObjet,new FileUpload(part.getSubmittedFileName(),b));
+
+                    }catch(Exception e){e.printStackTrace();}
                 }
             }
 

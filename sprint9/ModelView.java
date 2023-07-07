@@ -11,15 +11,11 @@ public class ModelView{
     }
     public ModelView(){}
 
-    public String getView() {
-        return view;
-    }
+    public String getView() {return view;}
+    public void setView(String view) {this.view = view;}
+
     public HashMap<String,Object> getData() {
         return data;
-    }
-
-    public void setView(String view) {
-        this.view = view;
     }
 
     public void addItem(String key, Object value) {
